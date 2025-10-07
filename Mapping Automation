@@ -1,0 +1,109 @@
+# Quotation Consolidation & Mapping Automation
+
+## Overview
+This project automates consolidation of quotation/RFQ Excel files received from multiple **manufacturers (MFGs)** into a single standardized Excel output. Each manufacturer may submit a slightly different sheet format — the scripts detect headers dynamically, normalize column names, extract manufacturer and product details, consolidate volume and pricing fields, and produce a single unified report for procurement analysis.
+
+---
+
+## Key Capabilities
+- Dynamic header detection (searches for `M.Item Name` in sheet rows)
+- Manufacturer extraction (from filename or from `Index` sheet)
+- Column normalization and mapping (unifies variant field names across suppliers)
+- Consolidation of multiple volume / volume-share columns into single standardized fields
+- Custom rounding and percentage handling for `Volume Share`
+- Reordering into a consistent final schema
+- Colored header formatting in output Excel for quick visual scanning
+- Robust error handling and informative debug prints
+
+---
+
+## Changelog / Version Summary
+
+### Version 1 (Baseline)
+- Basic consolidation from a folder (`Consolidated Portfolios`)
+- Header detection by searching top 10 rows for `M.Item Name`
+- Manufacturer name extracted from filename
+- Simple header coloring (orange & green)
+- Output: `Consolidated_Output_SCM1.xlsx`
+
+### **Version 2 (INFERRED — please upload v2 for exact details)**
+*(This is a best-effort summary inferred from differences between V1 and V3. Upload the v2 file for exact diffs.)*
+- Introduced stronger column standardization & mappings
+- Initial consolidation of multiple `Volume` and `Volume Share` columns into unified fields
+- Added placeholders / population for `Projected MFS Annual Qty Unit Level`, `Form or Unit Type`, `Potential at Pack Level`, `MFG Therapy Name`
+- Improved header-detection robustness beyond the strict top-10 check
+- Improved cleaning/unnamed-column handling and debug prints
+
+### Version 3 (Latest)
+- Manufacturer name extraction from `Index` sheet cell A9 (more reliable than filename)
+- Header detection expanded to search top 50 rows
+- Full consolidation of multiple volume/volume-share columns into `Volume` and `Volume Share`
+- `Volume Share` converted to percentage and custom-rounded
+- Introduced `colmap` and explicit renames: `Projected MFS Annual Qty Unit Level`, `Form or Unit Type`, `Potential at Pack Level`, `MFG Therapy Name`
+- Final schema reindexing to a consistent column order
+- Removal of stray `Unnamed:` columns (e.g., `Unnamed: 19`)
+- Highlighting of newly-added/fixed columns in yellow in the output Excel
+- Output: `consolidated_Olive_file.xlsx`
+
+---
+
+## Input format
+- Excel file(s) per manufacturer
+- Default expected sheet: `Mapped Sheet`
+- Important anchor column: **`M.Item Name`** (used to detect header row)
+- Place files into the configured folder (see script `FOLDER_PATH` variable)
+
+### Typical required / produced columns (final consolidated schema)
+- `Manufacturer`
+- `Hospital Name`
+- `MFS`
+- `Therapy` / `MFG Therapy Name`
+- `Projected MFS Annual Qty Unit Level`
+- `Form or Unit Type`
+- `Volume Share`
+- `Volume`
+- `M.Item Name`
+- `Potential at Pack Level`
+- Pricing and validity columns: `UPP`, `MRP / Pack level`, `Cost / Pack level`, `GST%`, `Quote Validity till date`, etc.
+
+---
+
+## How to run
+1. Install dependencies:
+   ```bash
+   pip install pandas openpyxl
+   ```
+
+2. Put manufacturer Excel files into the folder referenced by `FOLDER_PATH` in the script.
+
+3. Run the script (example for latest):
+   ```bash
+   python "consolidated mapped version 3 .py"
+   ```
+
+4. Output file will be created in the same directory (e.g., `consolidated_Olive_file.xlsx`).
+
+---
+
+## Tech stack
+- Python 3.x  
+- `pandas` — data cleaning & aggregation  
+- `openpyxl` — Excel read/write/formatting  
+- `os` / `math` — file handling and rounding utilities
+
+---
+
+## Future improvements
+- Add unit tests for header-detection and column-mapping logic
+- Batch support for CSV / Google Sheets
+- Auto email distribution of consolidated report
+- Power BI / dashboard export
+- Full change-tracking diff between versions (auto-generated)
+
+---
+
+## Notes / Tips
+- If the script reports `'M.Item Name' not found` → check that the sheet has a proper header row and that `M.Item Name` appears somewhere in the top rows.
+- For best results, keep input files consistent (use the provided schema where possible).
+- If a manufacturer’s name is not extracted correctly, include a standardized `Index` sheet with the manufacturer in cell A9 — V3 reads that automatically.
+
